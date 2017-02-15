@@ -1,12 +1,16 @@
-
+#include"renderEngine.h"
 #include"SoftRenderWindow.h"
-
+#include<iostream>
 int main()
 {
 	softRenderWindow win("render",800,600);
 	win.show();
 	bool exit = false;
 	MSG msg;
+	renderEngine render;
+	framebuffer rt;
+	win.renderTarget(&rt);
+	render.setRenderTarget(rt);
 	while (!exit)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -28,6 +32,7 @@ int main()
 		else
 		{
 			Sleep(1000);
+			render.drawFlatTriangle(glm::vec2(0.0, -0.8), glm::vec2(0.5, -0.5),glm::vec2(0.1, -0.5));
 			win.swapBuffer();
 		}
 	}

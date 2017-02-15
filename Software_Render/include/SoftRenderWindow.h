@@ -1,6 +1,12 @@
 #pragma once
 #include"myWindow.h"
 
+struct framebuffer
+{
+	int width;
+	int height;
+	unsigned char* pixels;
+};
 class softRenderWindow : public myWindow
 {
 public:
@@ -8,6 +14,8 @@ public:
 	~softRenderWindow();
 	void initBitmapEnv(int width,int height);
 	void swapBuffer();
+	void renderTarget(framebuffer* frame);
+	void clear();
 private:
 	HDC screenHDC, bitmapHDC;
 	HBITMAP frontbuffer_handle;

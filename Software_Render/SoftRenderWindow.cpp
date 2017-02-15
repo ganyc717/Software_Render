@@ -1,11 +1,34 @@
 #include"SoftRenderWindow.h"
 
+void softRenderWindow::renderTarget(framebuffer* frame)
+{
+	frame->width = width;
+	frame->height = height;
+	if (front)
+	{
+		frame->pixels = backbuffer_pixel;
+	}
+	else
+	{
+		frame->pixels = frontbuffer_pixel;
+	}
+}
+
+void softRenderWindow::clear()
+{
+	for (int i = 0; i < 24 / 8 * width*height ; i++)
+		frontbuffer_pixel[i] = 0xf0;
+	for (int i = 0 ; i < 24 / 8 * width*height; i++)
+		backbuffer_pixel[i] = 0xf0;
+}
+
+
 void softRenderWindow::initBitmapEnv(int w, int h)
 {
 	BITMAPINFO bitmapInfo = { 0 };
 	bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bitmapInfo.bmiHeader.biWidth = w;
-	bitmapInfo.bmiHeader.biHeight = -h;
+	bitmapInfo.bmiHeader.biHeight = h;
 	bitmapInfo.bmiHeader.biPlanes = 1;
 	bitmapInfo.bmiHeader.biBitCount = 24;
 	bitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -15,9 +38,9 @@ void softRenderWindow::initBitmapEnv(int w, int h)
 		DeleteObject(backbuffer_handle);
 	frontbuffer_handle = CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, (void**)&frontbuffer_pixel, NULL, 0);
 	backbuffer_handle = CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, (void**)&backbuffer_pixel, NULL, 0);
-	for (int i = 0; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height; i++)
-		frontbuffer_pixel[i] = 0xff;
-	for (int i = 0; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height; i++)
+	for (int i = 0; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height ; i++)
+		frontbuffer_pixel[i] = 0x00;
+	for (int i = 0 ; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height; i++)
 		backbuffer_pixel[i] = 0x00;
 }
 
