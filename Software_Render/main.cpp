@@ -32,7 +32,7 @@ int main()
 		else
 		{
 			Sleep(1000);
-			render.drawFlatTriangle(glm::vec2(0.0, -0.8), glm::vec2(0.5, -0.5),glm::vec2(0.1, -0.5));
+			render.drawTriangle(glm::vec2(0.3, -0.4), glm::vec2(0.5, -0.8),glm::vec2(0.1, -0.5));
 			win.swapBuffer();
 		}
 	}
