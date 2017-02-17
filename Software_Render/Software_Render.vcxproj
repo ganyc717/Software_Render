@@ -119,6 +119,7 @@
     <ClInclude Include="include\myWindow.h" />
     <ClInclude Include="include\renderEngine.h" />
     <ClInclude Include="include\SoftRenderWindow.h" />
+    <ClInclude Include="include\texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
@@ -126,6 +127,7 @@
     <ClCompile Include="myWindow.cpp" />
     <ClCompile Include="renderEngine.cpp" />
     <ClCompile Include="SoftRenderWindow.cpp" />
+    <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
