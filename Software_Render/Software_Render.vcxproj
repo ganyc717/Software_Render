@@ -117,7 +117,7 @@
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\Math.hpp" />
     <ClInclude Include="include\myWindow.h" />
-    <ClInclude Include="include\renderEngine.h" />
+    <ClInclude Include="include\engine.h" />
     <ClInclude Include="include\SoftRenderWindow.h" />
     <ClInclude Include="include\texture.h" />
   </ItemGroup>
@@ -125,7 +125,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="myWindow.cpp" />
-    <ClCompile Include="renderEngine.cpp" />
+    <ClCompile Include="engine.cpp" />
     <ClCompile Include="SoftRenderWindow.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>

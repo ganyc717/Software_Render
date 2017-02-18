@@ -47,11 +47,38 @@ bool Texture::load(const char* name)
 	return true;
 }
 
+glm::ivec3 sampler::texture2D(Texture texture, glm::vec2 uv)
+{
+	return sampler::texture2D(texture, uv.x, uv.y);
+}
+
+
+#define PIXEL_R(u,v) texture.data[(texture.height - 1 - v) * texture.width * 3 + u * 3 + 2]
+#define PIXEL_G(u,v) texture.data[(texture.height - 1 - v) * texture.width * 3 + u * 3 + 1]
+#define PIXEL_B(u,v) texture.data[(texture.height - 1 - v) * texture.width * 3 + u * 3 ]
+
+#define PIXEL(u,v) glm::vec3(PIXEL_R(u,v),PIXEL_G(u,v),PIXEL_B(u,v))
+// inverse the y axis
+
 glm::ivec3 sampler::texture2D(Texture texture, float u, float v)
 {
 	int u_pos = glm::floor(u / (1.0 / texture.width));
 	int v_pos = glm::floor(v / (1.0 / texture.height));
 	int u_pos_next = u_pos + 1;
 	int v_pos_next = v_pos + 1;
-	
+	if(u_pos == texture.width)
+		u_pos_next = u_pos - 1;
+	if (v_pos == texture.height)
+		v_pos_next = v_pos - 1;
+	float u_weight = 1.0 - (u - (float)u_pos / texture.width);
+	float v_weight = 1.0 - (v - (float)v_pos / texture.height);
+	glm::vec3 UV = PIXEL(u_pos, v_pos);
+	glm::vec3 UNext_V = PIXEL(u_pos_next, v_pos);
+	glm::vec3 U_VNext = PIXEL(u_pos, v_pos_next);
+	glm::vec3 UNext_VNext = PIXEL(u_pos_next, v_pos_next);
+	glm::vec3 color = u_weight * v_weight * UV +
+		u_weight * (1 - v_weight) * U_VNext +
+		(1 - u_weight) * v_weight * UNext_V +
+		(1 - u_weight) * (1 - v_weight) * UNext_VNext;
+	return glm::ivec3(glm::floor(color.x), glm::floor(color.y), glm::floor(color.z));
 }
