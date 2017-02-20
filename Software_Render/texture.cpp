@@ -66,6 +66,8 @@ glm::ivec3 sampler::texture2D(Texture* texture, float u, float v)
 	int v_pos = glm::floor(v / (1.0 / texture->height));
 	int u_pos_next = u_pos + 1;
 	int v_pos_next = v_pos + 1;
+
+	
 	if (u_pos == texture->width)
 		u_pos == texture->width - 1;
 	if (v_pos == texture->height)

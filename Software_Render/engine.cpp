@@ -97,34 +97,29 @@ void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3)
 	float m2 = (float)(p1.x - p3.x) / (p1.y - p3.y);
 	float b1 = (float)p1.x - m1 * p1.y;
 	float b2 = (float)p1.x - m2 * p1.y;
-	float delta_left = m1 * p1.y + b1;
-	float delta_right = m2 * p1.y + b2;
-	if (p1.y > p2.y)
+	float delta_Line1 = m1 * p1.y + b1;
+	float delta_Line2 = m2 * p1.y + b2;
+
+	int direction_Y = p1.y <= p2.y ? 1 : -1;
+	m1 *= direction_Y;
+	m2 *= direction_Y;
+
+	for (int i = 0; i <= glm::abs(p2.y - p1.y); i++)
 	{
-		for (int y = p1.y; y >= p2.y; y--)
+		int y = p1.y + direction_Y * i;
+		int edge1 = glm::floor(delta_Line1);
+		int edge2 = glm::floor(delta_Line2);
+		int direction_X = edge1 <= edge2 ? 1 : -1;
+
+		for (int j = 0; j <= glm::abs(edge1 - edge2); j++)
 		{
-			int x1_left = glm::floor(delta_left);
-			int x1_right = glm::floor(delta_right);
-			for (int x = glm::min(x1_left, x1_right); x <= glm::max(x1_right, x1_left); x++) {
-				COLOR_RED(x, y);
-			}
-			delta_left -= m1;
-			delta_right -= m2;
+			int x = edge1 + direction_X * j;
+			COLOR_RED(x, y);
 		}
+		delta_Line1 += m1;
+		delta_Line2 += m2;
 	}
-	else
-	{
-		for (int y = p1.y; y <= p2.y; y++)
-		{
-			int x1_left = glm::floor(delta_left);
-			int x1_right = glm::floor(delta_right);
-			for (int x = glm::min(x1_left, x1_right); x <= glm::max(x1_right, x1_left); x++) {
-				COLOR_RED(x, y);
-			}
-			delta_left += m1;
-			delta_right += m2;
-		}
-	}
+
 }
 void renderEngine::drawFlatTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3)
 {
@@ -224,46 +219,33 @@ void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3,
 	float m2 = (float)(p1.x - p3.x) / (p1.y - p3.y);
 	float b1 = (float)p1.x - m1 * p1.y;
 	float b2 = (float)p1.x - m2 * p1.y;
-	float delta_left = m1 * p1.y + b1;
-	float delta_right = m2 * p1.y + b2;
+	float delta_Line1 = m1 * p1.y + b1;
+	float delta_Line2 = m2 * p1.y + b2;
 	glm::vec2 alpha = uv2 - uv1;
 	glm::vec2 beta = uv3 - uv2;
 	float v_step = 1.0 / (float)(glm::abs(p1.y - p2.y));
 	float u_step = 1.0 / (float)(glm::abs(p1.x - p2.x));
 	glm::vec2 UV = uv1;
-	if (p1.y > p2.y)
+	int direction_Y = p1.y <= p2.y ? 1 : -1;
+	m1 *= direction_Y;
+	m2 *= direction_Y;
+
+	for (int i = 0; i <= glm::abs(p2.y - p1.y); i++)
 	{
-		for (int y = p1.y; y >= p2.y; y--)
+		int y = p1.y + direction_Y * i;
+		int edge1 = glm::floor(delta_Line1);
+		int edge2 = glm::floor(delta_Line2);
+		int direction_X = edge1 <= edge2 ? 1 : -1;
+		glm::vec2 scan = UV;
+		for (int j = 0; j <= glm::abs(edge1 - edge2); j++)
 		{
-			int x1_left = glm::floor(delta_left);
-			int x1_right = glm::floor(delta_right);
-			glm::vec2 scan = UV;
-			for (int x = glm::min(x1_left, x1_right); x <= glm::max(x1_right, x1_left); x++) {
-				//COLOR_RED(x, y);
-				COLOR(x, y, sampler::texture2D(texture, scan));
-				scan += u_step * beta;
-			}
-			delta_left -= m1;
-			delta_right -= m2;
-			UV += v_step * alpha;
+			int x = edge1 + direction_X * j;
+			COLOR(x, y, sampler::texture2D(texture, scan));
+			scan += u_step * beta;
 		}
-	}
-	else
-	{
-		for (int y = p1.y; y <= p2.y; y++)
-		{
-			int x1_left = glm::floor(delta_left);
-			int x1_right = glm::floor(delta_right);
-			glm::vec2 scan = UV;
-			for (int x = glm::min(x1_left, x1_right); x <= glm::max(x1_right, x1_left); x++) {
-				//COLOR_RED(x, y);
-				COLOR(x, y, sampler::texture2D(texture, scan));
-				scan += u_step * beta;
-			}
-			delta_left += m1;
-			delta_right += m2;
-			UV += v_step * alpha;
-		}
+		delta_Line1 += m1;
+		delta_Line2 += m2;
+		UV += v_step * alpha;
 	}
 }
 

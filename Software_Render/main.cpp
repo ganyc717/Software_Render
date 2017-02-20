@@ -33,7 +33,7 @@ int main()
 		else
 		{
 			Sleep(1000);
-//			engine.drawTriangle(glm::vec2(-0.5,-0.5), glm::vec2(0.5, -0.5),glm::vec2(0.5, 0.5),glm::vec2(0.0,0.0),glm::vec2(1.0,0.0),glm::vec2(1.0,1.0),&texture);
+			engine.drawTriangle(glm::vec2(-0.5,-0.5), glm::vec2(0.5, -0.5),glm::vec2(0.5, 0.5),glm::vec2(0.0,0.0),glm::vec2(1.0,0.0),glm::vec2(1.0,1.0),&texture);
 			engine.drawTriangle(glm::vec2(0.5, 0.5), glm::vec2(-0.5, 0.5), glm::vec2(-0.5, -0.5), glm::vec2(1.0, 1.0), glm::vec2(0.0, 1.0), glm::vec2(0.0, 0.0), &texture);
 			win.swapBuffer();
 		}
