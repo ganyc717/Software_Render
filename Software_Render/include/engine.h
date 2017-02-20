@@ -1,16 +1,7 @@
 #pragma once
-#include"SoftRenderWindow.h"
+#include"framebuffer.h"
 #include"texture.h"
 
-struct primitive
-{
-	glm::vec3 x1;
-	glm::vec3 x2;
-	glm::vec3 x3;
-	glm::vec2 uv1;
-	glm::vec2 uv2;
-	glm::vec2 uv3;
-};
 
 class renderEngine
 {

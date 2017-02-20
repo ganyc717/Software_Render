@@ -2,12 +2,12 @@
 
 
 #define BPP 3
-#define PIXEL_R(x,y) (rendertarget.pixels[y * WIDTH * BPP + x * BPP + 2])
-#define PIXEL_G(x,y) (rendertarget.pixels[y * WIDTH * BPP + x * BPP + 1])
-#define PIXEL_B(x,y) (rendertarget.pixels[y * WIDTH * BPP + x * BPP ])
+#define PIXEL_R(x,y) (rendertarget.pixels[0][y * WIDTH * BPP + x * BPP + 2])
+#define PIXEL_G(x,y) (rendertarget.pixels[0][y * WIDTH * BPP + x * BPP + 1])
+#define PIXEL_B(x,y) (rendertarget.pixels[0][y * WIDTH * BPP + x * BPP ])
 
-#define WIDTH  rendertarget.width 
-#define HEIGHT rendertarget.height
+#define WIDTH  rendertarget.width[0] 
+#define HEIGHT rendertarget.height[0]
 #define COLOR_RED(x,y) 			PIXEL_R(x, y) = 0xff;\
 								PIXEL_G(x, y) = 0x00;\
 								PIXEL_B(x, y) = 0x00

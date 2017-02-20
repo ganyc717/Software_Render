@@ -1,17 +1,8 @@
 #include"SoftRenderWindow.h"
 
-void softRenderWindow::renderTarget(framebuffer* frame)
+void softRenderWindow::bindEngine(renderEngine* engine)
 {
-	frame->width = width;
-	frame->height = height;
-	if (front)
-	{
-		frame->pixels = backbuffer_pixel;
-	}
-	else
-	{
-		frame->pixels = frontbuffer_pixel;
-	}
+	engine->setRenderTarget(renderTarget);
 }
 
 void softRenderWindow::clear()
@@ -55,7 +46,10 @@ softRenderWindow::softRenderWindow(const char* WindowName, int Width, int Height
 	initBitmapEnv(width, height);
 	SelectObject(bitmapHDC, frontbuffer_handle);
 	front = true;
-
+	pixels = backbuffer_pixel;
+	renderTarget.width = &width;
+	renderTarget.height = &height;
+	renderTarget.pixels = &pixels;
 }
 
 softRenderWindow::~softRenderWindow()
@@ -72,10 +66,12 @@ void softRenderWindow::swapBuffer()
 	if (front)
 	{
 		SelectObject(bitmapHDC, backbuffer_handle);
+		pixels = frontbuffer_pixel;
 	}
 	else
 	{
 		SelectObject(bitmapHDC, frontbuffer_handle);
+		pixels = backbuffer_pixel;
 	}
 	front = !front;
 	BitBlt(screenHDC, 0, 0, width, height, bitmapHDC, 0, 0, SRCCOPY);

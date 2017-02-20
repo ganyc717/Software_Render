@@ -7,12 +7,11 @@ int main()
 	win.show();
 	bool exit = false;
 	MSG msg;
-	renderEngine render;
+	renderEngine engine;
 	framebuffer rt;
 	Texture texture;
 	texture.load("Nature.bmp");
-	win.renderTarget(&rt);
-	render.setRenderTarget(rt);
+	win.bindEngine(&engine);
 	while (!exit)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -34,7 +33,8 @@ int main()
 		else
 		{
 			Sleep(1000);
-			render.drawTriangle(glm::vec2(-0.5,-0.5), glm::vec2(0.5, -0.5),glm::vec2(0.5, 0.5),glm::vec2(0.0,0.0),glm::vec2(1.0,0.0),glm::vec2(1.0,1.0),&texture);
+//			engine.drawTriangle(glm::vec2(-0.5,-0.5), glm::vec2(0.5, -0.5),glm::vec2(0.5, 0.5),glm::vec2(0.0,0.0),glm::vec2(1.0,0.0),glm::vec2(1.0,1.0),&texture);
+			engine.drawTriangle(glm::vec2(0.5, 0.5), glm::vec2(-0.5, 0.5), glm::vec2(-0.5, -0.5), glm::vec2(1.0, 1.0), glm::vec2(0.0, 1.0), glm::vec2(0.0, 0.0), &texture);
 			win.swapBuffer();
 		}
 	}

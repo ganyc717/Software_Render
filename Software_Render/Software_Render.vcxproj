@@ -115,6 +115,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\framebuffer.h" />
     <ClInclude Include="include\Math.hpp" />
     <ClInclude Include="include\myWindow.h" />
     <ClInclude Include="include\engine.h" />
