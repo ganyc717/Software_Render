@@ -60,8 +60,19 @@ glm::ivec3 sampler::texture2D(Texture* texture, glm::vec2 uv)
 #define PIXEL(u,v) glm::vec3(PIXEL_R(u,v),PIXEL_G(u,v),PIXEL_B(u,v))
 
 
-glm::ivec3 sampler::texture2D(Texture* texture, float u, float v)
+glm::ivec3 sampler::texture2D(Texture* texture, float U, float V)
 {
+	U = glm::abs(U);
+	V = glm::abs(V);
+	int u_floor = glm::floor(U) / 2 * 2;
+	int v_floor = glm::floor(V) / 2 * 2;
+	float u = U - u_floor;
+	float v = V - v_floor;
+	if (u >= 1.0)
+		u = 2.0 - u;
+	if (v >= 1.0)
+		v = 2.0 - v;
+
 	int u_pos = glm::floor(u / (1.0 / texture->width));
 	int v_pos = glm::floor(v / (1.0 / texture->height));
 	int u_pos_next = u_pos + 1;

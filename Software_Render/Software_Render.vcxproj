@@ -114,6 +114,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\3dShape.h" />
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\framebuffer.h" />
     <ClInclude Include="include\Math.hpp" />
