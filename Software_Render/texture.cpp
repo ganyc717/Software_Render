@@ -47,31 +47,36 @@ bool Texture::load(const char* name)
 	return true;
 }
 
-glm::ivec3 sampler::texture2D(Texture texture, glm::vec2 uv)
+glm::ivec3 sampler::texture2D(Texture* texture, glm::vec2 uv)
 {
 	return sampler::texture2D(texture, uv.x, uv.y);
 }
 
 
-#define PIXEL_R(u,v) texture.data[(texture.height - 1 - v) * texture.width * 3 + u * 3 + 2]
-#define PIXEL_G(u,v) texture.data[(texture.height - 1 - v) * texture.width * 3 + u * 3 + 1]
-#define PIXEL_B(u,v) texture.data[(texture.height - 1 - v) * texture.width * 3 + u * 3 ]
+#define PIXEL_R(u,v) texture->data[v * texture->width * 3 + u * 3 + 2]
+#define PIXEL_G(u,v) texture->data[v * texture->width * 3 + u * 3 + 1]
+#define PIXEL_B(u,v) texture->data[v * texture->width * 3 + u * 3 ]
 
 #define PIXEL(u,v) glm::vec3(PIXEL_R(u,v),PIXEL_G(u,v),PIXEL_B(u,v))
-// inverse the y axis
 
-glm::ivec3 sampler::texture2D(Texture texture, float u, float v)
+
+glm::ivec3 sampler::texture2D(Texture* texture, float u, float v)
 {
-	int u_pos = glm::floor(u / (1.0 / texture.width));
-	int v_pos = glm::floor(v / (1.0 / texture.height));
+	int u_pos = glm::floor(u / (1.0 / texture->width));
+	int v_pos = glm::floor(v / (1.0 / texture->height));
 	int u_pos_next = u_pos + 1;
 	int v_pos_next = v_pos + 1;
-	if(u_pos == texture.width)
+	if (u_pos == texture->width)
+		u_pos == texture->width - 1;
+	if (v_pos == texture->height)
+		v_pos = texture->height - 1;
+
+	if(u_pos == texture->width - 1)
 		u_pos_next = u_pos - 1;
-	if (v_pos == texture.height)
+	if (v_pos == texture->height - 1)
 		v_pos_next = v_pos - 1;
-	float u_weight = 1.0 - (u - (float)u_pos / texture.width);
-	float v_weight = 1.0 - (v - (float)v_pos / texture.height);
+	float u_weight = 1.0 - (u - (float)u_pos / texture->width);
+	float v_weight = 1.0 - (v - (float)v_pos / texture->height);
 	glm::vec3 UV = PIXEL(u_pos, v_pos);
 	glm::vec3 UNext_V = PIXEL(u_pos_next, v_pos);
 	glm::vec3 U_VNext = PIXEL(u_pos, v_pos_next);

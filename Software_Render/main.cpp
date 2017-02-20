@@ -1,4 +1,4 @@
-#include"renderEngine.h"
+#include"engine.h"
 #include"SoftRenderWindow.h"
 #include<iostream>
 int main()
@@ -9,6 +9,8 @@ int main()
 	MSG msg;
 	renderEngine render;
 	framebuffer rt;
+	Texture texture;
+	texture.load("Nature.bmp");
 	win.renderTarget(&rt);
 	render.setRenderTarget(rt);
 	while (!exit)
@@ -32,7 +34,7 @@ int main()
 		else
 		{
 			Sleep(1000);
-			render.drawTriangle(glm::vec2(0.3, -0.4), glm::vec2(0.5, -0.8),glm::vec2(0.1, -0.5));
+			render.drawTriangle(glm::vec2(-0.5,-0.5), glm::vec2(0.5, -0.5),glm::vec2(0.5, 0.5),glm::vec2(0.0,0.0),glm::vec2(1.0,0.0),glm::vec2(1.0,1.0),&texture);
 			win.swapBuffer();
 		}
 	}

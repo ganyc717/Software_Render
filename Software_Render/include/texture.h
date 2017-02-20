@@ -14,6 +14,6 @@ public:
 class sampler
 {
 public:
-	static glm::ivec3 texture2D(Texture texture,float u, float v);
-	static glm::ivec3 texture2D(Texture texture, glm::vec2 uv);
+	static glm::ivec3 texture2D(Texture* texture,float u, float v);
+	static glm::ivec3 texture2D(Texture* texture, glm::vec2 uv);
 };

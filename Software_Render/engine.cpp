@@ -208,7 +208,7 @@ void renderEngine::drawTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3)
 	drawFlatTriangle(p3, p2, p4);
 }
 
-void renderEngine::drawFlatTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture texture)
+void renderEngine::drawFlatTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture* texture)
 {
 	glm::ivec2 p1, p2, p3, exchange;
 	p1 = mapPoint(x1);
@@ -217,7 +217,7 @@ void renderEngine::drawFlatTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3, gl
 	drawFlatTriangle(p1, p2, p3, uv1, uv2, uv3, texture);
 }
 
-void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3,Texture texture)
+void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3,Texture* texture)
 {
 	assert(p2.y == p3.y);
 	float m1 = (float)(p1.x - p2.x) / (p1.y - p2.y);
@@ -267,7 +267,7 @@ void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3,
 	}
 }
 
-void renderEngine::drawTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture texture)
+void renderEngine::drawTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2 x3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture* texture)
 {
 	glm::ivec2 p1, p2, p3, exchange;
 	glm::vec2 UV1, UV2, UV3, exchangeUV;
