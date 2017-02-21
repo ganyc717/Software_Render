@@ -36,7 +36,7 @@
     <ClInclude Include="include\framebuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\3dShape.h">
+    <ClInclude Include="include\shape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
