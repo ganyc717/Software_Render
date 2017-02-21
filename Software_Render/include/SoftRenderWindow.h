@@ -2,6 +2,7 @@
 #include"myWindow.h"
 #include"framebuffer.h"
 #include"engine.h"
+#include<memory>
 
 class softRenderWindow : public myWindow
 {
@@ -16,9 +17,9 @@ private:
 	HDC screenHDC, bitmapHDC;
 	HBITMAP frontbuffer_handle;
 	HBITMAP backbuffer_handle;
-	unsigned char* frontbuffer_pixel;
-	unsigned char* backbuffer_pixel;
-	unsigned char* pixels;
+	framebuffer frontbuffer;
+	framebuffer backbuffer;
 	bool front;
-	framebuffer renderTarget;
+	framebuffer* renderTarget;
+	renderEngine* engine;
 };

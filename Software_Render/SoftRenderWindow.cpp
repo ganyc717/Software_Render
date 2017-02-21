@@ -1,16 +1,17 @@
 #include"SoftRenderWindow.h"
 
-void softRenderWindow::bindEngine(renderEngine* engine)
+void softRenderWindow::bindEngine(renderEngine* Engine)
 {
+	engine = Engine;
 	engine->setRenderTarget(renderTarget);
 }
 
 void softRenderWindow::clear()
 {
 	for (int i = 0; i < 24 / 8 * width*height ; i++)
-		frontbuffer_pixel[i] = 0xf0;
+		frontbuffer.pixels[i] = 0xff;
 	for (int i = 0 ; i < 24 / 8 * width*height; i++)
-		backbuffer_pixel[i] = 0xf0;
+		backbuffer.pixels[i] = 0xf0;
 }
 
 
@@ -27,12 +28,23 @@ void softRenderWindow::initBitmapEnv(int w, int h)
 		DeleteObject(frontbuffer_handle);
 	if(backbuffer_handle)
 		DeleteObject(backbuffer_handle);
-	frontbuffer_handle = CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, (void**)&frontbuffer_pixel, NULL, 0);
-	backbuffer_handle = CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, (void**)&backbuffer_pixel, NULL, 0);
+	frontbuffer_handle = CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, (void**)&frontbuffer.pixels, NULL, 0);
+	backbuffer_handle = CreateDIBSection(NULL, &bitmapInfo, DIB_RGB_COLORS, (void**)&backbuffer.pixels, NULL, 0);
+	frontbuffer.width = w;
+	backbuffer.width = w;
+	frontbuffer.height = h;
+	backbuffer.height = h;
+	frontbuffer.depth = new unsigned short[w * h];
+	backbuffer.depth = new unsigned short[w * h];
 	for (int i = 0; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height ; i++)
-		frontbuffer_pixel[i] = 0x00;
+		frontbuffer.pixels[i] = 0x00;
 	for (int i = 0 ; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height; i++)
-		backbuffer_pixel[i] = 0x00;
+		backbuffer.pixels[i] = 0x00;
+	for (int i = 0; i < w * h; i++)
+	{
+		frontbuffer.depth[i] = 0xffff;
+		backbuffer.depth[i] = 0xffff;
+	}
 }
 
 softRenderWindow::softRenderWindow(const char* WindowName, int Width, int Height):myWindow(WindowName, Width, Height)
@@ -46,10 +58,7 @@ softRenderWindow::softRenderWindow(const char* WindowName, int Width, int Height
 	initBitmapEnv(width, height);
 	SelectObject(bitmapHDC, frontbuffer_handle);
 	front = true;
-	pixels = backbuffer_pixel;
-	renderTarget.width = &width;
-	renderTarget.height = &height;
-	renderTarget.pixels = &pixels;
+	renderTarget = &backbuffer;
 }
 
 softRenderWindow::~softRenderWindow()
@@ -58,6 +67,10 @@ softRenderWindow::~softRenderWindow()
 	DeleteObject(backbuffer_handle);
 	DeleteDC(bitmapHDC);
 	ReleaseDC(getMyWindow(), screenHDC);
+	if (frontbuffer.depth)
+		delete[] frontbuffer.depth;
+	if (backbuffer.depth)
+		delete[] backbuffer.depth;
 }
 
 
@@ -66,12 +79,14 @@ void softRenderWindow::swapBuffer()
 	if (front)
 	{
 		SelectObject(bitmapHDC, backbuffer_handle);
-		pixels = frontbuffer_pixel;
+		renderTarget = &frontbuffer;
+		engine->setRenderTarget(renderTarget);
 	}
 	else
 	{
 		SelectObject(bitmapHDC, frontbuffer_handle);
-		pixels = backbuffer_pixel;
+		renderTarget = &backbuffer;
+		engine->setRenderTarget(renderTarget);
 	}
 	front = !front;
 	BitBlt(screenHDC, 0, 0, width, height, bitmapHDC, 0, 0, SRCCOPY);

@@ -10,7 +10,7 @@ int main()
 	renderEngine engine;
 	framebuffer rt;
 	Texture texture;
-	texture.load("Nature.bmp");
+	texture.load("texture\\Nature.bmp");
 	win.bindEngine(&engine);
 	while (!exit)
 	{

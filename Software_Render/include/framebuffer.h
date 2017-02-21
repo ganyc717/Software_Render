@@ -1,8 +1,10 @@
 #pragma once
 struct framebuffer
 {
-	int* width;
-	int* height;
-	int* bpp;
-	unsigned char** pixels;
+public:
+	int width;
+	int height;
+	int bpp;
+	unsigned char* pixels;
+	unsigned short* depth;
 };

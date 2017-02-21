@@ -9,7 +9,7 @@ public:
 	void drawLine(glm::vec2 x1, glm::vec2 x2);
 	void drawTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2);
 	void drawTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture* texture);
-	void setRenderTarget(framebuffer RT);
+	void setRenderTarget(framebuffer* RT);
 private:
 	void drawLine(glm::ivec2 x1, glm::ivec2 x2);
 	void drawFlatTriangle(glm::vec2 x1, glm::vec2 x2, glm::vec2);
@@ -18,5 +18,5 @@ private:
 	void drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3,Texture* texture);
 
 	glm::ivec2 mapPoint(glm::vec2 point);
-	framebuffer rendertarget;
+	framebuffer* rendertarget;
 };
