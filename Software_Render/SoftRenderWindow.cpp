@@ -34,16 +34,16 @@ void softRenderWindow::initBitmapEnv(int w, int h)
 	backbuffer.width = w;
 	frontbuffer.height = h;
 	backbuffer.height = h;
-	frontbuffer.depth = new unsigned short[w * h];
-	backbuffer.depth = new unsigned short[w * h];
+	frontbuffer.depth = new float[w * h];
+	backbuffer.depth = new float[w * h];
 	for (int i = 0; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height ; i++)
 		frontbuffer.pixels[i] = 0x00;
 	for (int i = 0 ; i < bitmapInfo.bmiHeader.biBitCount / 8 * width*height; i++)
 		backbuffer.pixels[i] = 0x00;
 	for (int i = 0; i < w * h; i++)
 	{
-		frontbuffer.depth[i] = 0xffff;
-		backbuffer.depth[i] = 0xffff;
+		frontbuffer.depth[i] = 2.0;
+		backbuffer.depth[i] = 2.0;    //The initilization vaule should be inf, 2.0 is enough for this program.
 	}
 }
 

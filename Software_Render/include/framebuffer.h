@@ -6,5 +6,6 @@ public:
 	int height;
 	int bpp;
 	unsigned char* pixels;
-	unsigned short* depth;
+	float* depth;
 };
+

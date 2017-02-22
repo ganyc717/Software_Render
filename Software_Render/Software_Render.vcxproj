@@ -114,10 +114,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pipeline.h" />
+    <ClInclude Include="include\primitive.h" />
     <ClInclude Include="include\shape.h" />
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\framebuffer.h" />
-    <ClInclude Include="include\Math.hpp" />
     <ClInclude Include="include\myWindow.h" />
     <ClInclude Include="include\engine.h" />
     <ClInclude Include="include\SoftRenderWindow.h" />
@@ -125,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="include\pipeline.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="myWindow.cpp" />
     <ClCompile Include="engine.cpp" />
