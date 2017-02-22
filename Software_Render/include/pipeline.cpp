@@ -421,5 +421,8 @@ void Pipeline::runPipeline(int count)
 	runVertexShader();    //Multiple the MVP matrix.
 	runPerspectiveDivide();   // PerspectiveDivide
 	runClip();
-
+	for (auto it = primitive.begin(); it != primitive.end(); it++)
+	{
+		engine->drawPrimitive(*it, texture);
+	}
 }
