@@ -228,7 +228,7 @@ void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3,
 	float alpha_depth = depth2 - depth1;
 	float beta_depth = depth3 - depth2;
 	float v_step = 1.0 / (float)(glm::abs(p1.y - p2.y));
-	float u_step = 1.0 / (float)(glm::abs(p1.x - p2.x));
+	float u_step = 1.0 / (float)(glm::abs(p3.x - p2.x));
 	glm::vec2 UV = uv1;
 	float depth = depth1;
 	int direction_Y = p1.y <= p2.y ? 1 : -1;
@@ -346,17 +346,30 @@ void renderEngine::drawTriangle(glm::vec4 x1, glm::vec4 x2, glm::vec4 x3, glm::v
 		return;
 	}
 
-	float k = (float)(p1.y - p3.y) / (p1.x - p3.x);
-	float b = p1.y - k * p1.x;
-	glm::ivec2 point4 = glm::ivec2(glm::floor((p2.y - b) / k), p2.y);
-	float delta = (float)(p1.y - p2.y) / (float)(p1.y - p3.y);
-	glm::vec2 uv4 = UV1 + delta * (UV3 - UV1);
+	glm::ivec2 point4;
+	if (point1.x != point3.x)
+	{
+		float k = (float)(point1.y - point3.y) / (point1.x - point3.x);
+		float b = point1.y - k * point1.x;
+		point4 = glm::ivec2(glm::floor((point2.y - b) / k), point2.y);
+	}
+	else
+	{
+		point4 = glm::ivec2(point1.x, point2.y);
+	}
+	/*
+	float k = (float)(point1.y - point3.y) / (point1.x - point3.x);
+	float b = point1.y - k * point1.x;
+	glm::ivec2 point4 = glm::ivec2(glm::floor((point2.y - b) / k), point2.y);
+	*/
+	float delta = (float)(point1.y - point2.y) / (float)(point1.y - point3.y);
+	glm::vec2 UV4 = UV1 + delta * (UV3 - UV1);
 	float depth = p1.z + delta * (p3.z - p1.z);
-	drawFlatTriangle(point1, point2, point4, p1.z, p2.z, depth, uv1, uv2, uv4, texture);
-	drawFlatTriangle(point3, point2, point4, p3.z, p2.z, depth, uv3, uv2, uv4, texture);
+	drawFlatTriangle(point1, point2, point4, p1.z, p2.z, depth, UV1, UV2, UV4, texture);
+	drawFlatTriangle(point3, point2, point4, p3.z, p2.z, depth, UV3, UV2, UV4, texture);
 }
 
 void renderEngine::drawPrimitive(Primitive primitive, Texture* texture)
 {
-	drawTriangle(primitive.p1, primitive.p2, primitive.p3, primitive.uv1, primitive.uv2, primitive.uv3, texture);
+	drawTriangle(primitive.position[0], primitive.position[1], primitive.position[2], primitive.uv[0], primitive.uv[1], primitive.uv[2], texture);
 }

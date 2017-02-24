@@ -60,7 +60,8 @@ int main()
 		}
 		else
 		{
-			Sleep(16);
+
+			win.clear();
 			glm::mat4 V = win.getCamera()->getViewMatrix();
 			glm::mat4 MVP = P*V*M;
 			pipeline.setMVPMat(MVP);
