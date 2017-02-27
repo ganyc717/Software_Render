@@ -117,8 +117,10 @@ void clip_OnePointOutOfBound(Primitive primitive, std::list<Primitive>& list, in
 	newPrimitive2.uv[1] = newUV1;
 	newPrimitive2.uv[2] = primitive.uv[B];
 
+
 	clip(newPrimitive1, list);
 	clip(newPrimitive2, list);
+
 }
 void clip_TwoPointOutOfBound(Primitive primitive, std::list<Primitive>& list, int outofboundPointPosition1, int outofboundPointPosition2, int status) //
 {
@@ -145,43 +147,38 @@ void clip_TwoPointOutOfBound(Primitive primitive, std::list<Primitive>& list, in
 	newPrimitive.uv[outofboundPointPosition1] = newUV1;
 	newPrimitive.uv[outofboundPointPosition2] = newUV2;
 	newPrimitive.uv[inboundPointPosition] = primitive.uv[inboundPointPosition];
+
 	clip(newPrimitive, list);
+
 }
 
-void clip(Primitive primitive, std::list<Primitive>& list, int status, int point)
+void clip(Primitive primitive, std::list<Primitive>& list, int status)
 {
-	int A = -1;
-	int B = -1;
-	if (!checkStatus(primitive.position[point], status))
+	int statusA = checkStatus(primitive.position[0],status);
+	int statusB = checkStatus(primitive.position[1], status);
+	int statusC = checkStatus(primitive.position[2], status);
+	if (statusA + statusB + statusC == 3)//All out of bound, abandon it.
 		return;
-	switch (point)
+	if (statusA + statusB + statusC == 2)//Two point out of bound.
 	{
-	case 0:
-		A = 1; B = 2; break;
-	case 1:
-		A = 0; B = 2; break;
-	case 2:
-		A = 0; B = 1; break;
-	default:
-		break;
+		if (statusA == 0)
+			clip_TwoPointOutOfBound(primitive, list, 1, 2, status);
+		if (statusB == 0)
+			clip_TwoPointOutOfBound(primitive, list, 2, 0, status);
+		if (statusC == 0)
+			clip_TwoPointOutOfBound(primitive, list, 0, 1, status);
 	}
-	int statusA = checkStatus(primitive.position[A],status);
-	int statusB = checkStatus(primitive.position[B], status);
-	if (statusA + statusB == 0)
+	if (statusA + statusB + statusC == 1)//One point out of bound.
 	{
-		clip_OnePointOutOfBound(primitive, list, point, status);
-		return;
+		if (statusA == 1)
+			clip_OnePointOutOfBound(primitive, list, 0, status);
+		if (statusB == 1)
+			clip_OnePointOutOfBound(primitive, list, 1, status);
+		if (statusC == 1)
+			clip_OnePointOutOfBound(primitive, list, 2, status);
 	}
-	if (statusA + statusB == 2)
-		return;
-	if (statusA == 1)
+	if (statusA + statusB + statusC == 0)//In bound.
 	{
-		clip_TwoPointOutOfBound(primitive, list, A, point, status);
-		return;
-	}
-	if (statusB == 1)
-	{
-		clip_TwoPointOutOfBound(primitive, list, B, point, status);
 		return;
 	}
 }
@@ -189,33 +186,19 @@ void clip(Primitive primitive, std::list<Primitive>& list, int status, int point
 
 void clip(Primitive primitive,std::list<Primitive>& list)
 {
-
+	
 	if (INBOUND(primitive.position[0]) && INBOUND(primitive.position[1]) && INBOUND(primitive.position[2]))   // All in bound
 	{
 		list.push_back(primitive);
 		return;
 	}
 
-	clip(primitive, list, STATUS_X_OUT_NEGTIVE, 0);
-	clip(primitive, list, STATUS_X_OUT_POSITIVE, 0);
-	clip(primitive, list, STATUS_Y_OUT_NEGTIVE, 0);
-	clip(primitive, list, STATUS_Y_OUT_POSITIVE, 0);
-	clip(primitive, list, STATUS_Z_OUT_NEGTIVE, 0);
-	clip(primitive, list, STATUS_Z_OUT_POSITIVE, 0);
-
-	clip(primitive, list, STATUS_X_OUT_NEGTIVE, 1);
-	clip(primitive, list, STATUS_X_OUT_POSITIVE, 1);
-	clip(primitive, list, STATUS_Y_OUT_NEGTIVE, 1);
-	clip(primitive, list, STATUS_Y_OUT_POSITIVE, 1);
-	clip(primitive, list, STATUS_Z_OUT_NEGTIVE, 1);
-	clip(primitive, list, STATUS_Z_OUT_POSITIVE, 1);
-
-	clip(primitive, list, STATUS_X_OUT_NEGTIVE, 2);
-	clip(primitive, list, STATUS_X_OUT_POSITIVE, 2);
-	clip(primitive, list, STATUS_Y_OUT_NEGTIVE, 2);
-	clip(primitive, list, STATUS_Y_OUT_POSITIVE, 2);
-	clip(primitive, list, STATUS_Z_OUT_NEGTIVE, 2);
-	clip(primitive, list, STATUS_Z_OUT_POSITIVE, 2);
+	clip(primitive, list, STATUS_X_OUT_NEGTIVE);
+	clip(primitive, list, STATUS_X_OUT_POSITIVE);
+	clip(primitive, list, STATUS_Y_OUT_NEGTIVE);
+	clip(primitive, list, STATUS_Y_OUT_POSITIVE);
+	clip(primitive, list, STATUS_Z_OUT_NEGTIVE);
+	clip(primitive, list, STATUS_Z_OUT_POSITIVE);
 }
 
 
