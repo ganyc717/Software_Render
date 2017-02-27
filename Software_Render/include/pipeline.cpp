@@ -3,7 +3,7 @@
 float Interpolation(float start, float end, float middle)
 {
 	assert(end != start);
-	return (middle - start) / (end - start);
+	return 1.0005 * (middle - start) / (end - start);//make sure the interpolation position is really in bound
 }
 
 glm::vec4 Interpolation(glm::vec4 start, glm::vec4 end, float k)
@@ -80,7 +80,7 @@ void clip_OnePointOutOfBound(Primitive primitive, std::list<Primitive>& list, in
 	case 0:
 		A = 1; B = 2; break;
 	case 1:
-		A = 0; B = 2; break;
+		A = 2; B = 0; break;
 	case 2:
 		A = 0; B = 1; break;
 	default:
@@ -103,15 +103,20 @@ void clip_OnePointOutOfBound(Primitive primitive, std::list<Primitive>& list, in
 	glm::vec2 newUV2 = Interpolation(primitive.uv[outofboundPointPosition], primitive.uv[B], kB);
 	Primitive newPrimitive1, newPrimitive2;
 
-	newPrimitive1 = primitive;
-	newPrimitive1.position[outofboundPointPosition] = newPosition1;
-	newPrimitive1.uv[outofboundPointPosition] = newUV1;
+	newPrimitive1.position[0] = newPosition1;
+	newPrimitive1.position[1] = primitive.position[A];;
+	newPrimitive1.position[2] = primitive.position[B];
+	newPrimitive1.uv[0] = newUV1;
+	newPrimitive1.uv[1] = primitive.uv[A];
+	newPrimitive1.uv[2] = primitive.uv[B];
+
 	newPrimitive2.position[0] = newPosition2;
 	newPrimitive2.position[1] = newPosition1;
 	newPrimitive2.position[2] = primitive.position[B];
 	newPrimitive2.uv[0] = newUV2;
 	newPrimitive2.uv[1] = newUV1;
 	newPrimitive2.uv[2] = primitive.uv[B];
+
 	clip(newPrimitive1, list);
 	clip(newPrimitive2, list);
 }
@@ -156,7 +161,7 @@ void clip(Primitive primitive, std::list<Primitive>& list, int status, int point
 	case 1:
 		A = 0; B = 2; break;
 	case 2:
-		A = 1; B = 2; break;
+		A = 0; B = 1; break;
 	default:
 		break;
 	}
