@@ -3,7 +3,7 @@
 float Interpolation(float start, float end, float middle)
 {
 	assert(end != start);
-	return 1.0005 * (middle - start) / (end - start);//make sure the interpolation position is really in bound
+	return 1.0005 * (middle - start) / (end - start);//make sure the interpolation position is really in bound, so we multiply 1.005
 }
 
 glm::vec4 Interpolation(glm::vec4 start, glm::vec4 end, float k)
@@ -67,14 +67,14 @@ void Pipeline::runPerspectiveDivide()
 			i->position[j] /= i->position[j].w;
 }
 
-void clip(Primitive primitive, std::list<Primitive>& list);
-void clip_OnePointOutOfBound(Primitive primitive, std::list<Primitive>& list, int outofboundPointPosition, int status)
+
+void clip_OnePointOutOfBound(std::list<Primitive>::iterator& it, std::list<Primitive>& list, int outofboundPointPosition, int status)
 {
 	float start, endA, endB, middle;
 	int A = -1;
 	int B = -1;
 
-	start = primitive.position[outofboundPointPosition][status / 2];
+	start = it->position[outofboundPointPosition][status / 2];
 	switch (outofboundPointPosition)
 	{
 	case 0:
@@ -92,37 +92,37 @@ void clip_OnePointOutOfBound(Primitive primitive, std::list<Primitive>& list, in
 		middle = -1.0;     // negtive out of bound
 	else
 		middle = 1.0;      // positive out of bound
-	start = primitive.position[outofboundPointPosition][status / 2];
-	endA = primitive.position[A][status / 2];
-	endB = primitive.position[B][status / 2];
+	start = it->position[outofboundPointPosition][status / 2];
+	endA = it->position[A][status / 2];
+	endB = it->position[B][status / 2];
 	float kA = Interpolation(start, endA, middle);
 	float kB = Interpolation(start, endB, middle);
-	glm::vec4 newPosition1 = Interpolation(primitive.position[outofboundPointPosition], primitive.position[A], kA);
-	glm::vec4 newPosition2 = Interpolation(primitive.position[outofboundPointPosition], primitive.position[B], kB);
-	glm::vec2 newUV1 = Interpolation(primitive.uv[outofboundPointPosition], primitive.uv[A], kA);
-	glm::vec2 newUV2 = Interpolation(primitive.uv[outofboundPointPosition], primitive.uv[B], kB);
+	glm::vec4 newPosition1 = Interpolation(it->position[outofboundPointPosition], it->position[A], kA);
+	glm::vec4 newPosition2 = Interpolation(it->position[outofboundPointPosition], it->position[B], kB);
+	glm::vec2 newUV1 = Interpolation(it->uv[outofboundPointPosition], it->uv[A], kA);
+	glm::vec2 newUV2 = Interpolation(it->uv[outofboundPointPosition], it->uv[B], kB);
 	Primitive newPrimitive1, newPrimitive2;
 
 	newPrimitive1.position[0] = newPosition1;
-	newPrimitive1.position[1] = primitive.position[A];;
-	newPrimitive1.position[2] = primitive.position[B];
+	newPrimitive1.position[1] = it->position[A];;
+	newPrimitive1.position[2] = it->position[B];
 	newPrimitive1.uv[0] = newUV1;
-	newPrimitive1.uv[1] = primitive.uv[A];
-	newPrimitive1.uv[2] = primitive.uv[B];
+	newPrimitive1.uv[1] = it->uv[A];
+	newPrimitive1.uv[2] = it->uv[B];
 
 	newPrimitive2.position[0] = newPosition2;
 	newPrimitive2.position[1] = newPosition1;
-	newPrimitive2.position[2] = primitive.position[B];
+	newPrimitive2.position[2] = it->position[B];
 	newPrimitive2.uv[0] = newUV2;
 	newPrimitive2.uv[1] = newUV1;
-	newPrimitive2.uv[2] = primitive.uv[B];
+	newPrimitive2.uv[2] = it->uv[B];
 
-
-	clip(newPrimitive1, list);
-	clip(newPrimitive2, list);
+	list.insert(it, newPrimitive1);
+	list.insert(it, newPrimitive2);
+	it = list.erase(it);
 
 }
-void clip_TwoPointOutOfBound(Primitive primitive, std::list<Primitive>& list, int outofboundPointPosition1, int outofboundPointPosition2, int status) //
+void clip_TwoPointOutOfBound(std::list<Primitive>::iterator& it, std::list<Primitive>& list, int outofboundPointPosition1, int outofboundPointPosition2, int status) //
 {
 	int inboundPointPosition = 3 - outofboundPointPosition1 - outofboundPointPosition2;
 	float startA, startB, end, middle;
@@ -131,88 +131,78 @@ void clip_TwoPointOutOfBound(Primitive primitive, std::list<Primitive>& list, in
 		middle = -1.0;     // negtive out of bound
 	else
 		middle = 1.0;      // positive out of bound
-	startA = primitive.position[outofboundPointPosition1][status / 2];
-	startB = primitive.position[outofboundPointPosition2][status / 2];
-	end = primitive.position[inboundPointPosition][status / 2];
+	startA = it->position[outofboundPointPosition1][status / 2];
+	startB = it->position[outofboundPointPosition2][status / 2];
+	end = it->position[inboundPointPosition][status / 2];
 	float kA = Interpolation(startA, end, middle);
 	float kB = Interpolation(startB, end, middle);
-	glm::vec4 newPosition1 = Interpolation(primitive.position[outofboundPointPosition1], primitive.position[inboundPointPosition], kA);
-	glm::vec4 newPosition2 = Interpolation(primitive.position[outofboundPointPosition2], primitive.position[inboundPointPosition], kB);
-	glm::vec2 newUV1 = Interpolation(primitive.uv[outofboundPointPosition1], primitive.uv[inboundPointPosition], kA);
-	glm::vec2 newUV2 = Interpolation(primitive.uv[outofboundPointPosition2], primitive.uv[inboundPointPosition], kB);
+	glm::vec4 newPosition1 = Interpolation(it->position[outofboundPointPosition1], it->position[inboundPointPosition], kA);
+	glm::vec4 newPosition2 = Interpolation(it->position[outofboundPointPosition2], it->position[inboundPointPosition], kB);
+	glm::vec2 newUV1 = Interpolation(it->uv[outofboundPointPosition1], it->uv[inboundPointPosition], kA);
+	glm::vec2 newUV2 = Interpolation(it->uv[outofboundPointPosition2], it->uv[inboundPointPosition], kB);
 	Primitive newPrimitive;
 	newPrimitive.position[outofboundPointPosition1] = newPosition1;
 	newPrimitive.position[outofboundPointPosition2] = newPosition2;
-	newPrimitive.position[inboundPointPosition] = primitive.position[inboundPointPosition];
+	newPrimitive.position[inboundPointPosition] = it->position[inboundPointPosition];
 	newPrimitive.uv[outofboundPointPosition1] = newUV1;
 	newPrimitive.uv[outofboundPointPosition2] = newUV2;
-	newPrimitive.uv[inboundPointPosition] = primitive.uv[inboundPointPosition];
+	newPrimitive.uv[inboundPointPosition] = it->uv[inboundPointPosition];
 
-	clip(newPrimitive, list);
+	list.insert(it, newPrimitive);
+	it = list.erase(it);
 
 }
 
-void clip(Primitive primitive, std::list<Primitive>& list, int status)
+void clip(std::list<Primitive>& list, int status)
 {
-	int statusA = checkStatus(primitive.position[0],status);
-	int statusB = checkStatus(primitive.position[1], status);
-	int statusC = checkStatus(primitive.position[2], status);
-	if (statusA + statusB + statusC == 3)//All out of bound, abandon it.
-		return;
-	if (statusA + statusB + statusC == 2)//Two point out of bound.
+	for (auto it = list.begin(); it != list.end();)
 	{
-		if (statusA == 0)
-			clip_TwoPointOutOfBound(primitive, list, 1, 2, status);
-		if (statusB == 0)
-			clip_TwoPointOutOfBound(primitive, list, 2, 0, status);
-		if (statusC == 0)
-			clip_TwoPointOutOfBound(primitive, list, 0, 1, status);
+		int statusA = checkStatus(it->position[0], status);
+		int statusB = checkStatus(it->position[1], status);
+		int statusC = checkStatus(it->position[2], status);
+		if (statusA + statusB + statusC == 3)//All out of bound, abandon it.
+		{
+			it = list.erase(it);
+			continue;
+		}
+		if (statusA + statusB + statusC == 2)//Two point out of bound.
+		{
+			if (statusA == 0)
+				clip_TwoPointOutOfBound(it, list, 1, 2, status);
+			if (statusB == 0)
+				clip_TwoPointOutOfBound(it, list, 2, 0, status);
+			if (statusC == 0)
+				clip_TwoPointOutOfBound(it, list, 0, 1, status);
+			continue;
+		}
+		if (statusA + statusB + statusC == 1)//One point out of bound.
+		{
+			if (statusA == 1)
+				clip_OnePointOutOfBound(it, list, 0, status);
+			if (statusB == 1)
+				clip_OnePointOutOfBound(it, list, 1, status);
+			if (statusC == 1)
+				clip_OnePointOutOfBound(it, list, 2, status);
+			continue;
+		}
+		if (statusA + statusB + statusC == 0)//In bound.
+		{
+			it++;
+		}
 	}
-	if (statusA + statusB + statusC == 1)//One point out of bound.
-	{
-		if (statusA == 1)
-			clip_OnePointOutOfBound(primitive, list, 0, status);
-		if (statusB == 1)
-			clip_OnePointOutOfBound(primitive, list, 1, status);
-		if (statusC == 1)
-			clip_OnePointOutOfBound(primitive, list, 2, status);
-	}
-	if (statusA + statusB + statusC == 0)//In bound.
-	{
-		return;
-	}
-}
-
-
-void clip(Primitive primitive,std::list<Primitive>& list)
-{
-	
-	if (INBOUND(primitive.position[0]) && INBOUND(primitive.position[1]) && INBOUND(primitive.position[2]))   // All in bound
-	{
-		list.push_back(primitive);
-		return;
-	}
-
-	clip(primitive, list, STATUS_X_OUT_NEGTIVE);
-	clip(primitive, list, STATUS_X_OUT_POSITIVE);
-	clip(primitive, list, STATUS_Y_OUT_NEGTIVE);
-	clip(primitive, list, STATUS_Y_OUT_POSITIVE);
-	clip(primitive, list, STATUS_Z_OUT_NEGTIVE);
-	clip(primitive, list, STATUS_Z_OUT_POSITIVE);
 }
 
 
 void Pipeline::runClip()
 {
-	for (auto it = primitive.begin(); it != primitive.end();)
-	{
-		std::list<Primitive> list;
-		Primitive current = *it;
-		clip(current, list);
-		primitive.splice(it, list);
-		it = primitive.erase(it);
-	}
+	clip(primitive, STATUS_X_OUT_NEGTIVE);
+	clip(primitive, STATUS_X_OUT_POSITIVE);
+	clip(primitive, STATUS_Y_OUT_NEGTIVE);
+	clip(primitive, STATUS_Y_OUT_POSITIVE);
+	clip(primitive, STATUS_Z_OUT_NEGTIVE);
+	clip(primitive, STATUS_Z_OUT_POSITIVE);
 }
+
 
 void Pipeline::runPipeline(int count)
 {
