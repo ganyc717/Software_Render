@@ -1,37 +1,42 @@
 #include"pipeline.h"
 
-float Interpolation(float start, float end, float middle)
-{
-	assert(end != start);
-	return 1.0005 * (middle - start) / (end - start);//make sure the interpolation position is really in bound, so we multiply 1.005
-}
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-glm::vec4 Interpolation(glm::vec4 start, glm::vec4 end, float k)
+float getLambda(glm::vec2 start, glm::vec2 end, int direction)
+{
+	assert(direction == 1 || direction == -1);
+	glm::mat2 mat = glm::mat2(end - start, glm::vec2(1, direction));
+	return (-glm::inverse(mat) * start).x;
+}
+/*
+middle = start + lambda * (end -  start);
+*/
+glm::vec4 getMiddlePoint(glm::vec4 start, glm::vec4 end, float k)
 {
 	return k * (end - start) + start;
 }
-glm::vec2 Interpolation(glm::vec2 start, glm::vec2 end, float k)
+glm::vec2 getMiddlePoint(glm::vec2 start, glm::vec2 end, float k)
 {
 	return k * (end - start) + start;
 }
 
 bool checkStatus(glm::vec4 position, int status)
 {
+	float bound = position.w;
 	switch (status) {
 	case STATUS_X_OUT_NEGTIVE:
-		return position.x < -1;
+		return position.x < -bound;
 	case STATUS_X_OUT_POSITIVE:
-		return position.x > 1;
+		return position.x > bound;
 	case STATUS_Y_OUT_NEGTIVE:
-		return position.y < -1;
+		return position.y < -bound;
 	case STATUS_Y_OUT_POSITIVE:
-		return position.y > 1;
+		return position.y > bound;
 	case STATUS_Z_OUT_NEGTIVE:
-		return position.z < -1;
+		return position.z < -bound;
 	case STATUS_Z_OUT_POSITIVE:
-		return position.z > 1;
-	case STATUS_IN_BOUND:
-		return INBOUND(position);
+		return position.z > bound;
 	default:
 		return false;
 	}
@@ -64,17 +69,26 @@ void Pipeline::runPerspectiveDivide()
 {
 	for (auto i = primitive.begin(); i != primitive.end(); i++)
 		for (int j = 0; j < 3; j++)
+		{
 			i->position[j] /= i->position[j].w;
+			for (int k = 0; k < 4; k++)
+			{
+				if (glm::abs(i->position[j][k]) > 1.0)
+					if (i->position[j][k] > 0)
+						i->position[j][k] = 1.0;
+					else
+						i->position[j][k] = -1.0;
+			}//Sometimes the precision is not enough, so make sure the coordinate is in the [-1,1]
+		}
 }
 
 
 void clip_OnePointOutOfBound(std::list<Primitive>::iterator& it, std::list<Primitive>& list, int outofboundPointPosition, int status)
 {
-	float start, endA, endB, middle;
+
 	int A = -1;
 	int B = -1;
-
-	start = it->position[outofboundPointPosition][status / 2];
+	int direction;
 	switch (outofboundPointPosition)
 	{
 	case 0:
@@ -89,18 +103,20 @@ void clip_OnePointOutOfBound(std::list<Primitive>::iterator& it, std::list<Primi
 	assert(A != -1);
 	assert(B != -1);
 	if (status % 2 == 0)
-		middle = -1.0;     // negtive out of bound
+		direction = -1;     // negtive out of bound
 	else
-		middle = 1.0;      // positive out of bound
-	start = it->position[outofboundPointPosition][status / 2];
-	endA = it->position[A][status / 2];
-	endB = it->position[B][status / 2];
-	float kA = Interpolation(start, endA, middle);
-	float kB = Interpolation(start, endB, middle);
-	glm::vec4 newPosition1 = Interpolation(it->position[outofboundPointPosition], it->position[A], kA);
-	glm::vec4 newPosition2 = Interpolation(it->position[outofboundPointPosition], it->position[B], kB);
-	glm::vec2 newUV1 = Interpolation(it->uv[outofboundPointPosition], it->uv[A], kA);
-	glm::vec2 newUV2 = Interpolation(it->uv[outofboundPointPosition], it->uv[B], kB);
+		direction = 1;      // positive out of bound
+	glm::vec2 start = glm::vec2(it->position[outofboundPointPosition][status / 2], it->position[outofboundPointPosition][3]);
+	glm::vec2 endA = glm::vec2(it->position[A][status / 2], it->position[A][3]);
+	glm::vec2 endB = glm::vec2(it->position[B][status / 2], it->position[B][3]);
+	float lambdaA = getLambda(start, endA, direction);
+	float lambdaB = getLambda(start, endB, direction);
+
+	glm::vec4 newPosition1 = getMiddlePoint(it->position[outofboundPointPosition], it->position[A], lambdaA);
+	glm::vec4 newPosition2 = getMiddlePoint(it->position[outofboundPointPosition], it->position[B], lambdaB);
+	glm::vec2 newUV1 = getMiddlePoint(it->uv[outofboundPointPosition], it->uv[A], lambdaA);
+	glm::vec2 newUV2 = getMiddlePoint(it->uv[outofboundPointPosition], it->uv[B], lambdaB);
+
 	Primitive newPrimitive1, newPrimitive2;
 
 	newPrimitive1.position[0] = newPosition1;
@@ -125,21 +141,26 @@ void clip_OnePointOutOfBound(std::list<Primitive>::iterator& it, std::list<Primi
 void clip_TwoPointOutOfBound(std::list<Primitive>::iterator& it, std::list<Primitive>& list, int outofboundPointPosition1, int outofboundPointPosition2, int status) //
 {
 	int inboundPointPosition = 3 - outofboundPointPosition1 - outofboundPointPosition2;
-	float startA, startB, end, middle;
+	int direction;
 
 	if (status % 2 == 0)
-		middle = -1.0;     // negtive out of bound
+		direction = -1;     // negtive out of bound
 	else
-		middle = 1.0;      // positive out of bound
-	startA = it->position[outofboundPointPosition1][status / 2];
-	startB = it->position[outofboundPointPosition2][status / 2];
-	end = it->position[inboundPointPosition][status / 2];
-	float kA = Interpolation(startA, end, middle);
-	float kB = Interpolation(startB, end, middle);
-	glm::vec4 newPosition1 = Interpolation(it->position[outofboundPointPosition1], it->position[inboundPointPosition], kA);
-	glm::vec4 newPosition2 = Interpolation(it->position[outofboundPointPosition2], it->position[inboundPointPosition], kB);
-	glm::vec2 newUV1 = Interpolation(it->uv[outofboundPointPosition1], it->uv[inboundPointPosition], kA);
-	glm::vec2 newUV2 = Interpolation(it->uv[outofboundPointPosition2], it->uv[inboundPointPosition], kB);
+		direction = 1;      // positive out of bound
+	glm::vec2 startA = glm::vec2(it->position[outofboundPointPosition1][status / 2], it->position[outofboundPointPosition1][3]);
+	glm::vec2 startB = glm::vec2(it->position[outofboundPointPosition2][status / 2], it->position[outofboundPointPosition2][3]);
+	glm::vec2 end = glm::vec2(it->position[inboundPointPosition][status / 2], it->position[inboundPointPosition][3]);
+	float lambdaA = getLambda(startA, end, direction);
+	float lambdaB = getLambda(startB, end, direction);
+
+	glm::vec4 newPosition1 = getMiddlePoint(it->position[outofboundPointPosition1], it->position[inboundPointPosition], lambdaA);
+	glm::vec2 newUV1 = getMiddlePoint(it->uv[outofboundPointPosition1], it->uv[inboundPointPosition], lambdaA);
+
+
+	glm::vec4 newPosition2 = getMiddlePoint(it->position[outofboundPointPosition2], it->position[inboundPointPosition], lambdaB);
+	glm::vec2 newUV2 = getMiddlePoint(it->uv[outofboundPointPosition2], it->uv[inboundPointPosition], lambdaB);
+
+
 	Primitive newPrimitive;
 	newPrimitive.position[outofboundPointPosition1] = newPosition1;
 	newPrimitive.position[outofboundPointPosition2] = newPosition2;
@@ -226,8 +247,9 @@ void Pipeline::runPipeline(int count)
 	}
 
 	runVertexShader();    //Multiple the MVP matrix.
-	runPerspectiveDivide();   // PerspectiveDivide
-	runClip();
+//	runPerspectiveDivide();   // PerspectiveDivide
+	runClip();             // We need clip in the linear space first and then perspective divide otherwise here will be error.
+	runPerspectiveDivide();// PerspectiveDivide
 	for (auto it = primitive.begin(); it != primitive.end(); it++)
 	{
 		engine->drawPrimitive(*it, texture);

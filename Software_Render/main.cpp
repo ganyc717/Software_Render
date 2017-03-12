@@ -22,13 +22,14 @@ int main()
 
 	pipeline.engine = &engine;
 	pipeline.texture = &texture;
+	const float L = 4;
 	float vertex[] = {
-		-1.0,0.0,-1.0,
-		1.0,0.0,-1.0,
-		1.0,0.0,1.0,
-		1.0,0.0,1.0,
-		-1.0,0.0,1.0,
-		-1.0,0.0,-1.0
+		-L,0.0,-L,
+		L,0.0,-L,
+		L,0.0,L,
+		L,0.0,L,
+		-L,0.0,L,
+		-L,0.0,-L
 	};
 	float uv[] = {
 		0.0,0.0,
