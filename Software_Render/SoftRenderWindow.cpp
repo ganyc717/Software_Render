@@ -11,7 +11,7 @@ void softRenderWindow::clear()
 	for (int i = 0; i < 24 / 8 * width*height; i++)
 		renderTarget->pixels[i] = 0x00;
 	for (int i = 0; i < width*height; i++)
-		renderTarget->depth[i] = 2.0;
+		renderTarget->depth[i] = 9999.0;
 }
 
 
