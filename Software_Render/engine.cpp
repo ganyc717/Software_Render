@@ -214,6 +214,7 @@ void renderEngine::drawFlatTriangle(glm::vec4 x1, glm::vec4 x2, glm::vec4 x3, gl
 	drawFlatTriangle(p1, p2, p3,x1.z,x2.z,x3.z, uv1, uv2, uv3, texture);
 }
 */
+/*
 void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3,float depth1,float depth2,float depth3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3,Texture* texture)
 {
 	assert(p2.y == p3.y);
@@ -261,7 +262,21 @@ void renderEngine::drawFlatTriangle(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3,
 		depth += v_step * alpha_depth;
 	}
 }
+*/
+void renderEngine::drawFlatTriangle(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture* texture)
+{
+	glm::ivec2 point1, point2, point3;
+	point1 = mapPoint(p1);
+	point2 = mapPoint(p2);
+	point3 = mapPoint(p3);
+	float m1 = (float)(p1.x - p2.x) / (p1.y - p2.y);
+	float m2 = (float)(p1.x - p3.x) / (p1.y - p3.y);
+	float b1 = (float)p1.x - m1 * p1.y;
+	float b2 = (float)p1.x - m2 * p1.y;
+	glm::vec2 alpha = uv2 - uv1;
+	glm::vec2 beta = uv3 - uv2;
 
+};
 void renderEngine::drawTriangle(glm::vec4 x1, glm::vec4 x2, glm::vec4 x3, glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, Texture* texture)
 {
 	glm::vec2 UV1, UV2, UV3, exchangeUV;
@@ -337,36 +352,44 @@ void renderEngine::drawTriangle(glm::vec4 x1, glm::vec4 x2, glm::vec4 x3, glm::v
 	}
 	if ((point2.y == point1.y))  //flat triangle
 	{
-		drawFlatTriangle(point3, point1, point2, p3.z, p1.z, p2.z, UV3, UV1, UV2, texture);
+		drawFlatTriangle(p3, p1, p2, UV3, UV1, UV2, texture);
 		return;
 	}
 	if ((point2.y == point3.y))    //flat triangle
 	{
-		drawFlatTriangle(point1, point2, point3, p1.z, p2.z, p3.z, UV1, UV2, UV3, texture);
+		drawFlatTriangle(p1, p2, p3, UV1, UV2, UV3, texture);
 		return;
 	}
 
-	glm::ivec2 point4;
-	if (point1.x != point3.x)
+	glm::vec4 p4;
+	glm::vec2 UV4;
+	float lambda = (p2.y - p1.y) / (p3.y - p1.y);
+	p4 = lambda * (p3 - p1) + p1;
+	UV4 = lambda * (UV3 - UV1) + UV1;
+	drawFlatTriangle(p1, p2, p4, UV1, UV2, UV4, texture);
+	drawFlatTriangle(p3, p2, p4, UV3, UV2, UV4, texture);
+	/*
+	if (p1.x != p3.x)
 	{
-		float k = (float)(point1.y - point3.y) / (point1.x - point3.x);
-		float b = point1.y - k * point1.x;
-		point4 = glm::ivec2(glm::floor((point2.y - b) / k), point2.y);
+		float k = (float)(p1.y - p3.y) / (p1.x - p3.x);
+		float b = p1.y - k * p1.x;
+		float lambda = (p2.y - p1.y) / (p3.y - p1.y);
+		p4 = glm::ivec2(glm::floor((point2.y - b) / k), point2.y);
 	}
 	else
 	{
 		point4 = glm::ivec2(point1.x, point2.y);
-	}
+	}*/
 	/*
 	float k = (float)(point1.y - point3.y) / (point1.x - point3.x);
 	float b = point1.y - k * point1.x;
 	glm::ivec2 point4 = glm::ivec2(glm::floor((point2.y - b) / k), point2.y);
-	*/
+	*//*
 	float delta = (float)(point1.y - point2.y) / (float)(point1.y - point3.y);
 	glm::vec2 UV4 = UV1 + delta * (UV3 - UV1);
 	float depth = p1.z + delta * (p3.z - p1.z);
 	drawFlatTriangle(point1, point2, point4, p1.z, p2.z, depth, UV1, UV2, UV4, texture);
-	drawFlatTriangle(point3, point2, point4, p3.z, p2.z, depth, UV3, UV2, UV4, texture);
+	drawFlatTriangle(point3, point2, point4, p3.z, p2.z, depth, UV3, UV2, UV4, texture);*/
 }
 
 void renderEngine::drawPrimitive(Primitive primitive, Texture* texture)

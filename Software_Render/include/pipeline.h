@@ -10,7 +10,7 @@ public:
 	void LoadVertex(float* );
 	void LoadTexCoord(float* );
 	void setMVPMat(glm::mat4 mvp);
-	void runPipeline(int count);        //count is the triangle count we want to draw
+	void runPipeline(int start,int count);        //count is the triangle count we want to draw
 	renderEngine* engine;
 	Texture* texture;
 private:

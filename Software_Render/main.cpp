@@ -14,7 +14,7 @@ int main()
 	framebuffer rt;
 	Texture texture;
 	Pipeline pipeline;
-	texture.load("texture\\Nature.bmp");
+	texture.load("texture\\4c.bmp");
 	win.bindEngine(&engine);
 	glm::mat4 M = glm::mat4(1.0);
 
@@ -22,22 +22,26 @@ int main()
 
 	pipeline.engine = &engine;
 	pipeline.texture = &texture;
-	const float L = 4;
+	const float L = 1.0;
+	
 	float vertex[] = {
-		-L,0.0,-L,
-		L,0.0,-L,
-		L,0.0,L,
-		L,0.0,L,
 		-L,0.0,L,
-		-L,0.0,-L
+		L,0.0,L,
+		L,0.0,-L,
+
+		L,0.0,-L,
+		-L,0.0,-L,
+		-L,0.0,L
 	};
 	float uv[] = {
-		0.0,0.0,
-		1.0,0.0,
-		1.0,1.0,
-		1.0,1.0,
 		0.0,1.0,
-		0.0,0.0
+		1.0,1.0,
+		1.0,0.0,
+
+		1.0,0.0,
+		0.0,0.0,
+		0.0,1.0
+
 	};
 	pipeline.LoadVertex(vertex);
 	pipeline.LoadTexCoord(uv);
@@ -70,7 +74,7 @@ int main()
 			engine.drawTriangle(glm::vec2(-0.5,-0.5), glm::vec2(0.5, -0.5),glm::vec2(0.5, 0.5),glm::vec2(0.0,0.0),glm::vec2(2.0,0.0),glm::vec2(2.0,2.0),&texture);
 			engine.drawTriangle(glm::vec2(0.5, 0.5), glm::vec2(-0.5, 0.5), glm::vec2(-0.5, -0.5), glm::vec2(2.0, 2.0), glm::vec2(0.0, 2.0), glm::vec2(0.0, 0.0), &texture);
 			*/
-			pipeline.runPipeline(2);
+			pipeline.runPipeline(0,2);
 			win.swapBuffer();
 		}
 	}

@@ -7,7 +7,8 @@ float getLambda(glm::vec2 start, glm::vec2 end, int direction)
 {
 	assert(direction == 1 || direction == -1);
 	glm::mat2 mat = glm::mat2(end - start, glm::vec2(1, direction));
-	return (-glm::inverse(mat) * start).x;
+	float result = (-glm::inverse(mat) * start).x;
+	return result;
 }
 /*
 middle = start + lambda * (end -  start);
@@ -68,10 +69,14 @@ void Pipeline::runVertexShader()
 void Pipeline::runPerspectiveDivide()
 {
 	for (auto i = primitive.begin(); i != primitive.end(); i++)
+	{
 		for (int j = 0; j < 3; j++)
 		{
-			i->position[j] /= i->position[j].w;
-			for (int k = 0; k < 4; k++)
+			float W = i->position[j].w;
+			i->uv[j] /= W;
+			i->position[j] /= W;
+			i->position[j].w = 1 / W;    // Used to Perspective interpolation later
+			for (int k = 0; k < 2; k++)
 			{
 				if (glm::abs(i->position[j][k]) > 1.0)
 					if (i->position[j][k] > 0)
@@ -80,6 +85,7 @@ void Pipeline::runPerspectiveDivide()
 						i->position[j][k] = -1.0;
 			}//Sometimes the precision is not enough, so make sure the coordinate is in the [-1,1]
 		}
+	}
 }
 
 
@@ -225,12 +231,12 @@ void Pipeline::runClip()
 }
 
 
-void Pipeline::runPipeline(int count)
+void Pipeline::runPipeline(int start,int count)
 {
 	assert(vertexIn != NULL);
 	assert(texcoord != NULL);
 	primitive.clear();
-	for (int i = 0; i < count; i++)
+	for (int i = start; i < count + start; i++)
 	{
 		Primitive pushback;
 
