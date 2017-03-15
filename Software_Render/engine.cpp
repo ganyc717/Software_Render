@@ -76,7 +76,7 @@ void renderEngine::drawFlatTriangle(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, gl
 		for (int j = 0; j <= glm::abs(edge1 - edge2); j++)
 		{
 			int x = edge1 + direction_X * j;
-			float w = 1 / W;
+			float w = 1 / w_scan;
 			glm::vec2 uv = uv_scan * w;//  uv * w to recover its real value   (W == 1/w)
 			if (DEPTH(x, y) > w)
 			{

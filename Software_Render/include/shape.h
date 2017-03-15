@@ -1,6 +1,68 @@
 #pragma once
 
-const float cube_vertex[] = {
+const float CubeL = 0.5;
+
+float cube_vertex[] = {
+-CubeL,-CubeL,-CubeL,
+CubeL,-CubeL,-CubeL,
+CubeL,-CubeL,CubeL,
+
+CubeL,-CubeL,CubeL,
+-CubeL,-CubeL,CubeL,
+-CubeL,-CubeL,-CubeL,
+
+-CubeL,-CubeL,-CubeL,
+CubeL,-CubeL,-CubeL,
+CubeL,CubeL,CubeL,
+
+CubeL,CubeL,-CubeL,
+-CubeL,CubeL,-CubeL,
+-CubeL,-CubeL,-CubeL,
+
+CubeL,-CubeL,-CubeL,
+CubeL,-CubeL,CubeL,
+CubeL,CubeL,-CubeL,
+
+CubeL,CubeL,-CubeL,
+CubeL,CubeL,CubeL,
+CubeL,-CubeL,CubeL,
+
+-CubeL,-CubeL,-CubeL,
+-CubeL,-CubeL,CubeL,
+-CubeL,CubeL,-CubeL,
+
+-CubeL,CubeL,-CubeL,
+-CubeL,CubeL,CubeL,
+-CubeL,-CubeL,CubeL,
+
+-CubeL,CubeL,-CubeL,
+CubeL,CubeL,-CubeL,
+-CubeL,CubeL,CubeL,
+
+-CubeL,CubeL,CubeL,
+CubeL,CubeL,CubeL,
+CubeL,CubeL,-CubeL,
+
+-CubeL,CubeL,CubeL,
+CubeL,CubeL,CubeL,
+-CubeL,-CubeL,CubeL,
+
+-CubeL,-CubeL,CubeL,
+CubeL,-CubeL,CubeL,
+CubeL,CubeL,CubeL,
+};
+
+
+
+
+
+
+
+
+
+
+/*
+float cube_vertex[] = {
 	3.0,0.0,3.0,
 	6.0,0.0,3.0,
 	6.0,0.0,6.0,
@@ -49,8 +111,8 @@ const float cube_vertex[] = {
 	6.0,0.0,6.0,
 	6.0,3.0,6.0,
 };
-
-const float cube_texcoord[] = {
+*/
+float cube_texcoord[] = {
 	0.0,0.0,  0.0,1.0,  1.0,1.0,
 	1.0,1.0,  1.0,0.0,  0.0,0.0,
 
